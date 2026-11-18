@@ -186,9 +186,9 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
 
-            <p className="text-center text-xs text-gray-500 md:text-left">
-              © {new Date().getFullYear()} Panpie. All rights reserved.
-            </p>
+            <p className="text-xs text-gray-400 mt-16">
+  © 2026 Panpie. All rights reserved.
+</p>
 
             <div className="flex gap-6 text-xs text-gray-500">
               <Link

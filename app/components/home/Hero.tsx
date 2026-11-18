@@ -1,10 +1,12 @@
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Check,
   ShoppingCart,
   ArrowRight,
   Play,
+  Star,
 } from "lucide-react";
 
 const features = [
@@ -42,19 +44,16 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* Heading */}
-            <h1 className="font-heading text-[42px] sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.08] font-bold text-[#171717] tracking-tight">
+            <h1 className="font-[family-name:var(--font-poppins)] text-[40px] sm:text-5xl md:text-6xl xl:text-[68px] leading-[1.12] font-extrabold text-[#171717] tracking-[-2px]">
+  ENJOY YOUR
 
-              ENJOY YOUR
-
-              <span className="block text-[#ef2929] italic">
-                PIZZA IN TOWN!
-              </span>
-
-            </h1>
+  <span className="block text-[#ef2929] italic mt-1">
+    PIZZA IN TOWN!
+  </span>
+</h1>
 
             {/* Underline */}
-            <div className="w-48 h-2 bg-[#ffb900] rounded-full mt-6 mb-7 mx-auto lg:mx-0" />
+            <div className="w-40 h-[7px] bg-[#ffb900] rounded-full mt-6 mb-7 mx-auto lg:mx-0" />
 
             {/* Description */}
             <p className="font-sans text-gray-600 text-base md:text-lg leading-8 max-w-[470px] mx-auto lg:mx-0">
@@ -119,9 +118,12 @@ export default function Hero() {
             {/* Pizza Image */}
             <div className="relative z-10 w-full max-w-[600px] mx-auto">
 
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=85"
                 alt="Freshly baked delicious pepperoni pizza"
+                width={1200}
+                height={1200}
+                priority
                 className="w-full aspect-square object-cover rounded-full drop-shadow-2xl"
               />
 
@@ -140,8 +142,8 @@ export default function Hero() {
 
             {/* Decorative Label */}
             <div className="absolute bottom-0 right-0 z-20 bg-white px-5 py-3 rounded-full shadow-lg rotate-[-5deg] hidden sm:block">
-              <p className="text-xs font-bold text-gray-800">
-                <span className="text-[#ef2929]">★</span>
+              <p className="text-xs font-bold text-gray-800 flex items-center gap-1">
+                <Star size={13} fill="currentColor" className="text-[#ef2929]" />
                 MADE WITH LOVE
               </p>
             </div>

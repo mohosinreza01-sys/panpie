@@ -45,9 +45,9 @@ export default function NotFound() {
 
         </div>
 
-        <p className="text-xs text-gray-400 mt-16">
-          © {new Date().getFullYear()} Panpie. All rights reserved.
-        </p>
+       <p className="text-xs text-gray-400 mt-16">
+  © 2026 Panpie. All rights reserved.
+</p>
 
       </div>
     </main>

@@ -58,16 +58,16 @@ const products: Product[] = [
     rating: "5.0",
   },
   {
-    id: 4,
-    name: "Chicken Sandwich",
-    description: "Fresh bread with delicious chicken and cheese filling.",
-    image:
-      "https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=600&q=85",
-    price: 12,
-    rating: "4.5",
-    badge: "NEW",
-    badgeColor: "bg-[#f52e26] text-white",
-  },
+  id: 4,
+  name: "Chicken Sandwich",
+  description: "Fresh bread with delicious chicken and cheese filling.",
+  image:
+    "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=85",
+  price: 12,
+  rating: "4.5",
+  badge: "NEW",
+  badgeColor: "bg-[#f52e26] text-white",
+},
 ];
 
 export default function PopularProductsSection() {

@@ -31,11 +31,9 @@ const products: Product[] = [
   {
     id: 1,
     name: "Burger Kingo",
-    description:
-      "Gorgonzola, mozzarella, taleggio, red onions, capers, olives.",
+    description: "Gorgonzola, mozzarella, taleggio, red onions, capers, olives.",
     price: "$25.00",
-    image:
-      "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
     badge: "POPULAR",
     options: ["Large", "Medium", "Small"],
@@ -43,32 +41,26 @@ const products: Product[] = [
   {
     id: 2,
     name: "French Fries",
-    description:
-      "Crispy golden potato fries with a delicious seasoning.",
+    description: "Crispy golden potato fries with a delicious seasoning.",
     price: "$25.00",
-    image:
-      "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
     options: ["Double Crust", "Regular"],
   },
   {
     id: 3,
     name: "Pizza BBQ TinTin",
-    description:
-      "Fresh mozzarella, BBQ sauce, vegetables and delicious toppings.",
+    description: "Fresh mozzarella, BBQ sauce, vegetables and delicious toppings.",
     price: "$18.00",
-    image:
-      "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
   },
   {
     id: 4,
     name: "BBQ Pizza TinTin",
-    description:
-      "Premium cheese, fresh tomatoes, olives and special BBQ sauce.",
+    description: "Premium cheese, fresh tomatoes, olives and special BBQ sauce.",
     price: "$20.00",
-    image:
-      "https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
     badge: "NEW",
     options: ["Large", "Medium"],
@@ -76,58 +68,46 @@ const products: Product[] = [
   {
     id: 5,
     name: "Cold Drinks",
-    description:
-      "Refreshing chilled drinks for your perfect meal.",
+    description: "Refreshing chilled drinks for your perfect meal.",
     price: "$5.00",
-    image:
-      "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=600&q=85",
     category: "drinks",
   },
   {
-    id: 6,
-    name: "Club Sandwich",
-    description:
-      "Fresh bread, vegetables, cheese and delicious filling.",
-    price: "$12.00",
-    image:
-      "https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=500&q=85",
-    category: "sandwich",
-  },
+  id: 6,
+  name: "Club Sandwich",
+  description: "Fresh bread, vegetables, cheese and delicious filling.",
+  price: "$12.00",
+  image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=85",
+  category: "sandwich",
+},
   {
     id: 7,
     name: "Chocolate Donuts",
-    description:
-      "Soft and fluffy donuts topped with rich chocolate.",
+    description: "Soft and fluffy donuts topped with rich chocolate.",
     price: "$8.00",
-    image:
-      "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=600&q=85",
     category: "donuts",
   },
   {
     id: 8,
     name: "Sweet Donuts",
-    description:
-      "Delicious sweet donuts with premium toppings.",
+    description: "Delicious sweet donuts with premium toppings.",
     price: "$10.00",
-    image:
-      "https://images.unsplash.com/photo-1533910534207-90f31029a78e?auto=format&fit=crop&w=500&q=85",
+    image: "https://images.unsplash.com/photo-1533910534207-90f31029a78e?auto=format&fit=crop&w=600&q=85",
     category: "donuts",
   },
 ];
 
 export default function FoodMenuSection() {
-  const [activeCategory, setActiveCategory] =
-    useState<Category>("all");
-
+  const [activeCategory, setActiveCategory] = useState<Category>("all");
   const [cartCount, setCartCount] = useState(0);
   const [addedProducts, setAddedProducts] = useState<number[]>([]);
 
   const filteredProducts =
     activeCategory === "all"
       ? products
-      : products.filter(
-          (product) => product.category === activeCategory
-        );
+      : products.filter((product) => product.category === activeCategory);
 
   const handleAddToCart = (id: number) => {
     setCartCount((count) => count + 1);
@@ -139,18 +119,18 @@ export default function FoodMenuSection() {
       id="menu"
       className="relative overflow-hidden bg-white py-20 lg:py-24"
     >
-      {/* Decorative Background */}
-      <div className="pointer-events-none absolute left-10 top-40 text-7xl text-gray-100 opacity-60">
-        <span>🍔</span>
+      {/* Background Decoration */}
+      <div className="pointer-events-none absolute left-10 top-40 text-7xl opacity-10">
+        🍔
       </div>
 
-      <div className="pointer-events-none absolute right-16 top-44 text-7xl text-gray-100 opacity-60">
-        <span>🍕</span>
+      <div className="pointer-events-none absolute right-16 top-44 text-7xl opacity-10">
+        🍕
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1200px] px-5">
 
-        {/* Section Heading */}
+        {/* Heading */}
         <div className="mx-auto mb-10 max-w-[550px] text-center">
           <span className="text-sm font-extrabold uppercase tracking-[3px] text-[#f52e26]">
             Fresh From Panpie
@@ -162,8 +142,8 @@ export default function FoodMenuSection() {
           </h2>
 
           <p className="mt-4 text-sm leading-7 text-gray-500 md:text-base">
-            Discover our delicious collection of freshly prepared
-            food made with love and quality ingredients.
+            Discover our delicious collection of freshly prepared food
+            made with love and quality ingredients.
           </p>
         </div>
 
@@ -191,20 +171,19 @@ export default function FoodMenuSection() {
           </span>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-
+        {/* Products */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="group rounded-xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-xl"
+              className="group overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-xl"
             >
               {/* Product Image */}
-              <div className="relative mb-4 flex h-[205px] items-center justify-center">
+              <div className="relative mb-5 flex h-[210px] items-center justify-center rounded-xl bg-[#fffaf2]">
 
                 {product.badge && (
                   <span
-                    className={`absolute left-0 top-0 z-20 rounded-full px-3 py-1.5 text-[10px] font-bold ${
+                    className={`absolute left-3 top-3 z-20 rounded-full px-3 py-1.5 text-[10px] font-bold ${
                       product.badge === "POPULAR"
                         ? "bg-[#f52e26] text-white"
                         : "bg-[#ffb900] text-black"
@@ -214,13 +193,14 @@ export default function FoodMenuSection() {
                   </span>
                 )}
 
-                <div className="relative h-[175px] w-[175px] overflow-hidden rounded-full">
+                {/* Circular Image */}
+                <div className="relative aspect-square w-[175px] overflow-hidden rounded-full bg-gray-100 ring-4 ring-white shadow-md">
                   <Image
                     src={product.image}
                     alt={product.name}
                     fill
-                    sizes="175px"
-                    className="rounded-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="(max-width: 640px) 175px, (max-width: 1024px) 175px, 175px"
+                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
                   />
                 </div>
               </div>
@@ -239,10 +219,12 @@ export default function FoodMenuSection() {
                 {product.options ? (
                   <select
                     aria-label={`Select ${product.name} size`}
-                    className="max-w-[125px] rounded-full border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#f52e26]"
+                    className="max-w-[125px] rounded-full border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#f52e26]"
                   >
                     {product.options.map((option) => (
-                      <option key={option}>{option}</option>
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
                     ))}
                   </select>
                 ) : (
@@ -257,11 +239,15 @@ export default function FoodMenuSection() {
               </div>
 
               {/* Add Button */}
-              <div className="mt-4 flex justify-end">
+              <div className="mt-5 flex justify-end">
                 <button
                   onClick={() => handleAddToCart(product.id)}
                   aria-label={`Add ${product.name} to cart`}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffb900] text-white transition-all duration-300 hover:bg-[#f52e26]"
+                  className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-all duration-300 ${
+                    addedProducts.includes(product.id)
+                      ? "bg-green-500"
+                      : "bg-[#ffb900] hover:bg-[#f52e26]"
+                  }`}
                 >
                   {addedProducts.includes(product.id) ? (
                     <Check size={18} />
@@ -272,10 +258,9 @@ export default function FoodMenuSection() {
               </div>
             </div>
           ))}
-
         </div>
 
-        {/* View All Button */}
+        {/* View All */}
         <div className="mt-12 text-center">
           <Link
             href="/menu"

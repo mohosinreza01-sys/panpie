@@ -1,5 +1,7 @@
 
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
+
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "../app/components/layout/Navbar";
@@ -8,6 +10,13 @@ import Footer from "./components/layout/Footer";
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -28,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${playfair.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${poppins.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <Navbar />
