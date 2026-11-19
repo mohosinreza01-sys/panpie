@@ -18,17 +18,18 @@ import {
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Menu", href: "/menu" },
+  { label: "Shop", href: "/shop" },
+
   {
-    label: "Pages",
-    href: "/pages",
+    label: "About us",
+    href: "/about",
     children: [
-      { label: "About Us", href: "/about" },
       { label: "Our Chefs", href: "/chefs" },
       { label: "Contact", href: "/contact" },
+      
     ],
   },
-  { label: "Blog", href: "/blog" },
-  { label: "Shop", href: "/shop" },
+
 ];
 
 export default function Navbar() {
