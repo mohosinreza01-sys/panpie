@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,7 +8,12 @@ import {
   Heart,
   Plus,
   Star,
+  Check,
 } from "lucide-react";
+import { useState } from "react";
+
+import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
 
 type Product = {
   id: number;
@@ -58,32 +62,66 @@ const products: Product[] = [
     rating: "5.0",
   },
   {
-  id: 4,
-  name: "Chicken Sandwich",
-  description: "Fresh bread with delicious chicken and cheese filling.",
-  image:
-    "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=85",
-  price: 12,
-  rating: "4.5",
-  badge: "NEW",
-  badgeColor: "bg-[#f52e26] text-white",
-},
+    id: 4,
+    name: "Chicken Sandwich",
+    description: "Fresh bread with delicious chicken and cheese filling.",
+    image:
+      "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=85",
+    price: 12,
+    rating: "4.5",
+    badge: "NEW",
+    badgeColor: "bg-[#f52e26] text-white",
+  },
 ];
 
 export default function PopularProductsSection() {
-  const [wishlist, setWishlist] = useState<number[]>([]);
-  const [cart, setCart] = useState<number[]>([]);
+  const [addedProducts, setAddedProducts] = useState<number[]>([]);
 
-  const toggleWishlist = (id: number) => {
-    setWishlist((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
+  const addToCart = useCartStore((state) => state.addToCart);
+  const cartItems = useCartStore((state) => state.items);
+
+  const {
+    items: wishlist,
+    toggleWishlist,
+  } = useWishlistStore();
+
+  const cartCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: String(product.id),
+      name: product.name,
+      slug: product.name.toLowerCase().replace(/\s+/g, "-"),
+      price: product.price,
+      image: product.image,
+      size: "Regular",
+      color: "Default",
+    });
+
+    setAddedProducts((previous) =>
+      previous.includes(product.id)
+        ? previous
+        : [...previous, product.id]
     );
+
+    setTimeout(() => {
+      setAddedProducts((previous) =>
+        previous.filter((id) => id !== product.id)
+      );
+    }, 1200);
   };
 
-  const addToCart = (id: number) => {
-    setCart((prev) => [...prev, id]);
+  const handleWishlist = (product: Product) => {
+    toggleWishlist({
+      id: String(product.id),
+      name: product.name,
+      slug: product.name.toLowerCase().replace(/\s+/g, "-"),
+      price: product.price,
+      image: product.image,
+    });
   };
 
   return (
@@ -115,108 +153,140 @@ export default function PopularProductsSection() {
           </Link>
         </div>
 
+        {/* Cart & Wishlist Info */}
+        <div className="mb-6 flex justify-end gap-3">
+          <span className="rounded-full bg-[#fff5e2] px-4 py-2 text-xs font-bold text-gray-700">
+            Cart: {cartCount}
+          </span>
+
+          <Link
+            href="/wishlist"
+            className="rounded-full bg-red-50 px-4 py-2 text-xs font-bold text-red-500"
+          >
+            Wishlist: {wishlist.length}
+          </Link>
+        </div>
+
         {/* Product Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => {
+            const isWishlisted = wishlist.some(
+              (item) => item.id === String(product.id)
+            );
 
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
-            >
-              {/* Product Image */}
-              <div className="relative flex h-[235px] items-center justify-center overflow-hidden bg-[#faf6ef]">
+            const isAdded = addedProducts.includes(product.id);
 
-                {product.badge && (
-                  <span
-                    className={`absolute left-4 top-4 z-10 rounded-full px-3 py-2 text-[11px] font-bold ${product.badgeColor}`}
-                  >
-                    {product.badge}
-                  </span>
-                )}
+            return (
+              <div
+                key={product.id}
+                className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              >
+                {/* Product Image */}
+                <div className="relative flex h-[235px] items-center justify-center overflow-hidden bg-[#faf6ef]">
 
-                {/* Wishlist */}
-                <button
-                  type="button"
-                  aria-label={`Add ${product.name} to wishlist`}
-                  onClick={() => toggleWishlist(product.id)}
-                  className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white text-gray-500 shadow-sm transition hover:text-[#f52e26]"
-                >
-                  <Heart
-                    size={18}
-                    className={
-                      wishlist.includes(product.id)
-                        ? "fill-[#f52e26] text-[#f52e26]"
-                        : ""
-                    }
-                  />
-                </button>
-
-                <div className="relative h-[190px] w-[190px] overflow-hidden rounded-full">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="190px"
-                    className="rounded-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                </div>
-              </div>
-
-              {/* Product Details */}
-              <div className="p-5">
-
-                {/* Rating */}
-                <div className="mb-3 flex items-center gap-1 text-xs text-[#ffb900]">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={13}
-                      fill="currentColor"
-                      strokeWidth={1.5}
-                    />
-                  ))}
-
-                  <span className="ml-1 text-gray-500">
-                    ({product.rating})
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-extrabold text-[#171717]">
-                  {product.name}
-                </h3>
-
-                <p className="mt-2 min-h-[48px] text-sm leading-6 text-gray-500">
-                  {product.description}
-                </p>
-
-                {/* Price & Add Button */}
-                <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
-
-                  <div>
-                    <span className="text-xl font-black text-[#f52e26]">
-                      ${product.price.toFixed(2)}
+                  {product.badge && (
+                    <span
+                      className={`absolute left-4 top-4 z-10 rounded-full px-3 py-2 text-[11px] font-bold ${product.badgeColor}`}
+                    >
+                      {product.badge}
                     </span>
+                  )}
 
-                    {product.oldPrice && (
-                      <span className="ml-1 text-sm text-gray-400 line-through">
-                        ${product.oldPrice}
-                      </span>
-                    )}
-                  </div>
-
+                  {/* Wishlist */}
                   <button
                     type="button"
-                    onClick={() => addToCart(product.id)}
-                    aria-label={`Add ${product.name} to cart`}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffb900] text-white transition hover:bg-[#f52e26]"
+                    aria-label={
+                      isWishlisted
+                        ? "Remove from wishlist"
+                        : `Add ${product.name} to wishlist`
+                    }
+                    onClick={() => handleWishlist(product)}
+                    className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white text-gray-500 shadow-sm transition hover:text-[#f52e26]"
                   >
-                    <Plus size={20} />
+                    <Heart
+                      size={18}
+                      className={
+                        isWishlisted
+                          ? "fill-[#f52e26] text-[#f52e26]"
+                          : ""
+                      }
+                    />
                   </button>
+
+                  <div className="relative h-[190px] w-[190px] overflow-hidden rounded-full">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="190px"
+                      className="rounded-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                </div>
+
+                {/* Product Details */}
+                <div className="p-5">
+
+                  {/* Rating */}
+                  <div className="mb-3 flex items-center gap-1 text-xs text-[#ffb900]">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={13}
+                        fill="currentColor"
+                        strokeWidth={1.5}
+                      />
+                    ))}
+
+                    <span className="ml-1 text-gray-500">
+                      ({product.rating})
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-extrabold text-[#171717]">
+                    {product.name}
+                  </h3>
+
+                  <p className="mt-2 min-h-[48px] text-sm leading-6 text-gray-500">
+                    {product.description}
+                  </p>
+
+                  {/* Price & Add Button */}
+                  <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
+
+                    <div>
+                      <span className="text-xl font-black text-[#f52e26]">
+                        ৳{product.price.toFixed(2)}
+                      </span>
+
+                      {product.oldPrice && (
+                        <span className="ml-1 text-sm text-gray-400 line-through">
+                          ৳{product.oldPrice.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAddToCart(product)}
+                      aria-label={`Add ${product.name} to cart`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full text-white transition ${
+                        isAdded
+                          ? "bg-green-500"
+                          : "bg-[#ffb900] hover:bg-[#f52e26]"
+                      }`}
+                    >
+                      {isAdded ? (
+                        <Check size={20} />
+                      ) : (
+                        <Plus size={20} />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-
+            );
+          })}
         </div>
 
         {/* Bottom CTA */}

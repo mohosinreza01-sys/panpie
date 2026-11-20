@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CartDrawer = () => {
+const page = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const CartDrawer = () => {
   )
 }
 
-export default CartDrawer
+export default page

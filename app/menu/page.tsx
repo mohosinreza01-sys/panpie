@@ -13,142 +13,90 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 
-type Category = "All" | "Pizza" | "Burger" | "Sandwich" | "Drinks" | "Desserts";
+import productsData from "@/data/products.json";
+import categoriesData from "@/data/categories.json";
+import { useCartStore } from "@/store/cart-store";
 
 type Product = {
-  id: number;
+  id: string;
   name: string;
+  slug: string;
   description: string;
-  image: string;
   price: number;
-  rating: string;
-  category: Exclude<Category, "All">;
-  badge?: string;
+  discountPrice?: number;
+  category: string;
+  image: string;
+  images?: string[];
+  isFeatured?: boolean;
+  isPopular?: boolean;
+  isAvailable?: boolean;
+  rating?: number;
+  preparationTime?: string;
 };
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Classic Beef Burger",
-    description: "Juicy beef patty with fresh lettuce and cheese.",
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700&auto=format&fit=crop&q=85",
-    price: 12,
-    rating: "4.9",
-    category: "Burger",
-    badge: "BEST SELLER",
-  },
-  {
-    id: 2,
-    name: "Chicken Sandwich",
-    description: "Fresh bread with delicious chicken and cheese filling.",
-    image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=700&auto=format&fit=crop&q=85",
-    price: 10,
-    rating: "4.5",
-    category: "Sandwich",
-    badge: "NEW",
-  },
-  {
-    id: 3,
-    name: "Pepperoni Pizza",
-    description: "Classic pizza topped with cheese and pepperoni.",
-    image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=700&auto=format&fit=crop&q=85",
-    price: 15,
-    rating: "4.8",
-    category: "Pizza",
-  },
-  {
-    id: 4,
-    name: "French Fries",
-    description: "Golden crispy fries with our special seasoning.",
-    image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=700&auto=format&fit=crop&q=85",
-    price: 6,
-    rating: "4.7",
-    category: "Desserts",
-  },
-  {
-    id: 5,
-    name: "BBQ Chicken Pizza",
-    description: "Smoky BBQ chicken with mozzarella cheese.",
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=700&auto=format&fit=crop&q=85",
-    price: 16,
-    rating: "4.9",
-    category: "Pizza",
-    badge: "POPULAR",
-  },
-  {
-    id: 6,
-    name: "Chocolate Donut",
-    description: "Soft and fluffy donut with rich chocolate topping.",
-    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=700&auto=format&fit=crop&q=85",
-    price: 5,
-    rating: "4.6",
-    category: "Desserts",
-  },
-  {
-    id: 7,
-    name: "Fresh Orange Juice",
-    description: "Freshly squeezed orange juice, served chilled.",
-    image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=700&auto=format&fit=crop&q=85",
-    price: 4,
-    rating: "4.8",
-    category: "Drinks",
-  },
-  {
-    id: 8,
-    name: "Chicken Burger",
-    description: "Crispy chicken with fresh vegetables and sauce.",
-    image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=700&auto=format&fit=crop&q=85",
-    price: 11,
-    rating: "4.7",
-    category: "Burger",
-  },
-  {
-  id: 9,
-  name: "Club Sandwich",
-  description: "Fresh bread, vegetables, cheese and delicious filling.",
-  image:
-    "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=700&auto=format&fit=crop&q=85",
-  price: 12,
-  rating: "4.8",
-  category: "Sandwich",
-},
-];
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  image?: string;
+};
 
-const categories: Category[] = [
-  "All",
-  "Pizza",
-  "Burger",
-  "Sandwich",
-  "Drinks",
-  "Desserts",
-];
+const products = productsData as Product[];
+const categories = categoriesData as Category[];
+
+const formatPrice = (price: number) =>
+  `৳${price.toLocaleString("en-BD")}`;
 
 export default function MenuPage() {
-  const [activeCategory, setActiveCategory] = useState<Category>("All");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
-  const [cartCount, setCartCount] = useState(0);
+
+  const cartItems = useCartStore((state) => state.items);
+  const addToCart = useCartStore((state) => state.addToCart);
+
+  const cartCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesCategory =
-        activeCategory === "All" || product.category === activeCategory;
+        activeCategory === "all" ||
+        product.category === activeCategory;
 
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
+      const matchesSearch =
+        product.name.toLowerCase().includes(search.toLowerCase());
 
-      return matchesCategory && matchesSearch;
+      return (
+        matchesCategory &&
+        matchesSearch &&
+        product.isAvailable !== false
+      );
     });
   }, [activeCategory, search]);
 
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.discountPrice ?? product.price,
+      image: product.image,
+      size: "Regular",
+      color: "Default",
+    });
+  };
+
   return (
-    <main className="bg-white min-h-screen">
+    <main className="min-h-screen bg-white">
+
       {/* HERO */}
       <section className="relative overflow-hidden bg-[#191919]">
         <div className="absolute inset-0 opacity-20">
           <Image
             src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1600"
-            alt="Pizza background"
+            alt="Restaurant food"
             fill
             priority
             className="object-cover"
@@ -156,24 +104,28 @@ export default function MenuPage() {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-5 lg:px-8 py-24 md:py-32 text-center">
-          <span className="inline-flex items-center gap-2 bg-[#f52e26] text-white text-xs font-bold tracking-[3px] px-5 py-2 rounded-full mb-6">
-            <span className="w-2 h-2 rounded-full bg-white" />
+        <div className="relative mx-auto max-w-7xl px-5 py-24 text-center md:py-32 lg:px-8">
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#f52e26] px-5 py-2 text-xs font-bold tracking-[3px] text-white">
+            <span className="h-2 w-2 rounded-full bg-white" />
             OUR FOOD MENU
           </span>
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl">
             Delicious Food,
-            <span className="text-[#f52e26]"> Happy Moments.</span>
+            <span className="text-[#f52e26]">
+              {" "}Happy Moments.
+            </span>
           </h1>
 
-          <p className="text-gray-300 max-w-xl mx-auto mt-6 text-sm md:text-base leading-7">
+          <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-gray-300 md:text-base">
             Explore our delicious selection of freshly prepared meals.
             Made with love, served with passion.
           </p>
 
-          <div className="flex items-center justify-center gap-2 mt-8 text-sm text-gray-300">
-            <Link href="/" className="hover:text-[#f52e26]">Home</Link>
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-300">
+            <Link href="/" className="hover:text-[#f52e26]">
+              Home
+            </Link>
             <span>/</span>
             <span className="text-[#f52e26]">Menu</span>
           </div>
@@ -181,16 +133,19 @@ export default function MenuPage() {
       </section>
 
       {/* MENU SECTION */}
-      <section className="max-w-7xl mx-auto px-5 lg:px-8 py-16 md:py-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <section className="mx-auto max-w-7xl px-5 py-16 md:py-24 lg:px-8">
+
+        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <span className="text-[#f52e26] font-bold text-xs tracking-[3px] uppercase">
+            <span className="text-xs font-bold uppercase tracking-[3px] text-[#f52e26]">
               Explore Our Menu
             </span>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-[#191919] mt-3">
+
+            <h2 className="mt-3 text-3xl font-extrabold text-[#191919] md:text-5xl">
               Our Delicious Food
             </h2>
-            <p className="text-gray-500 mt-3 text-sm">
+
+            <p className="mt-3 text-sm text-gray-500">
               Find your favorite food from our wide selection.
             </p>
           </div>
@@ -203,122 +158,168 @@ export default function MenuPage() {
         </div>
 
         {/* SEARCH */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
             <Search
               size={19}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
             />
+
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search your favorite food..."
-              className="w-full h-13 border border-gray-200 rounded-xl pl-12 pr-4 outline-none focus:border-[#f52e26] transition"
+              className="h-13 w-full rounded-xl border border-gray-200 pl-12 pr-4 outline-none transition focus:border-[#f52e26]"
             />
           </div>
 
-          <div className="flex items-center gap-2 px-5 h-13 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600">
+          <div className="flex h-13 items-center gap-2 rounded-xl border border-gray-200 px-5 text-sm font-semibold text-gray-600">
             <SlidersHorizontal size={17} />
             {filteredProducts.length} Items Found
           </div>
         </div>
 
         {/* CATEGORY FILTER */}
-        <div className="flex gap-3 overflow-x-auto pb-4 mb-10 scrollbar-hide">
+        <div className="scrollbar-hide mb-10 flex gap-3 overflow-x-auto pb-4">
+          <button
+            onClick={() => setActiveCategory("all")}
+            className={`shrink-0 rounded-full px-6 py-3 text-sm font-bold transition-all ${
+              activeCategory === "all"
+                ? "bg-[#f52e26] text-white shadow-lg shadow-red-200"
+                : "bg-[#f7f7f7] text-gray-600 hover:bg-[#191919] hover:text-white"
+            }`}
+          >
+            All
+          </button>
+
           {categories.map((category) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`shrink-0 px-6 py-3 rounded-full text-sm font-bold transition-all ${
-                activeCategory === category
+              key={category.id}
+              onClick={() => setActiveCategory(category.slug)}
+              className={`shrink-0 rounded-full px-6 py-3 text-sm font-bold transition-all ${
+                activeCategory === category.slug
                   ? "bg-[#f52e26] text-white shadow-lg shadow-red-200"
                   : "bg-[#f7f7f7] text-gray-600 hover:bg-[#191919] hover:text-white"
               }`}
             >
-              {category}
+              {category.name}
             </button>
           ))}
         </div>
 
         {/* PRODUCTS GRID */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_15px_45px_rgba(0,0,0,0.09)] transition-all duration-300"
-              >
-                <div className="relative h-60 sm:h-64 overflow-hidden bg-gray-100">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredProducts.map((product) => {
+              const finalPrice =
+                product.discountPrice ?? product.price;
 
-                  {product.badge && (
-                    <span className="absolute top-4 left-4 bg-[#f52e26] text-white text-[10px] font-extrabold tracking-wider px-4 py-2 rounded-full">
-                      {product.badge}
-                    </span>
-                  )}
+              return (
+                <div
+                  key={product.id}
+                  className="group overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:shadow-[0_15px_45px_rgba(0,0,0,0.09)]"
+                >
+                  <div className="relative h-60 overflow-hidden bg-gray-100 sm:h-64">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
 
-                  <div className="absolute top-4 right-4 bg-white px-3 py-2 rounded-full flex items-center gap-1 shadow-sm">
-                    <Star size={13} fill="#f5a623" color="#f5a623" />
-                    <span className="text-xs font-bold">{product.rating}</span>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <span className="text-[11px] font-bold uppercase tracking-[2px] text-[#f52e26]">
-                    {product.category}
-                  </span>
-
-                  <h3 className="text-xl font-extrabold text-[#191919] mt-2 group-hover:text-[#f52e26] transition-colors">
-                    {product.name}
-                  </h3>
-
-                  <p className="text-gray-500 text-sm leading-6 mt-2 min-h-12">
-                    {product.description}
-                  </p>
-
-                  <div className="flex items-center justify-between border-t border-gray-100 mt-5 pt-5">
-                    <div>
-                      <span className="text-xs text-gray-400 block">Price</span>
-                      <span className="text-2xl font-extrabold text-[#f52e26]">
-                        ${product.price.toFixed(2)}
+                    {(product.isPopular || product.isFeatured) && (
+                      <span className="absolute left-4 top-4 rounded-full bg-[#f52e26] px-4 py-2 text-[10px] font-extrabold tracking-wider text-white">
+                        {product.isPopular ? "POPULAR" : "FEATURED"}
                       </span>
-                    </div>
+                    )}
 
-                    <button
-                      onClick={() => setCartCount((count) => count + 1)}
-                      aria-label={`Add ${product.name} to cart`}
-                      className="flex items-center gap-2 bg-[#191919] text-white px-5 py-3 rounded-full text-sm font-bold hover:bg-[#f52e26] transition-colors"
-                    >
-                      <Plus size={17} />
-                      Add To Cart
-                    </button>
+                    {product.rating && (
+                      <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-white px-3 py-2 shadow-sm">
+                        <Star
+                          size={13}
+                          fill="#f5a623"
+                          color="#f5a623"
+                        />
+                        <span className="text-xs font-bold">
+                          {product.rating}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-6">
+                    <span className="text-[11px] font-bold uppercase tracking-[2px] text-[#f52e26]">
+                      {categories.find(
+                        (category) => category.slug === product.category
+                      )?.name ?? product.category}
+                    </span>
+
+                    <h3 className="mt-2 text-xl font-extrabold text-[#191919] transition-colors group-hover:text-[#f52e26]">
+                      {product.name}
+                    </h3>
+
+                    <p className="mt-2 min-h-12 text-sm leading-6 text-gray-500">
+                      {product.description}
+                    </p>
+
+                    {product.preparationTime && (
+                      <p className="mt-2 text-xs text-gray-400">
+                        Preparation: {product.preparationTime}
+                      </p>
+                    )}
+
+                    <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-5">
+                      <div>
+                        <span className="block text-xs text-gray-400">
+                          Price
+                        </span>
+
+                        <span className="text-2xl font-extrabold text-[#f52e26]">
+                          {formatPrice(finalPrice)}
+                        </span>
+
+                        {product.discountPrice &&
+                          product.discountPrice < product.price && (
+                            <span className="ml-2 text-sm text-gray-400 line-through">
+                              {formatPrice(product.price)}
+                            </span>
+                          )}
+                      </div>
+
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        aria-label={`Add ${product.name} to cart`}
+                        className="flex items-center gap-2 rounded-full bg-[#191919] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#f52e26]"
+                      >
+                        <Plus size={17} />
+                        Add To Cart
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <Search size={38} className="mx-auto text-gray-300 mb-4" />
+          <div className="py-20 text-center">
+            <Search size={38} className="mx-auto mb-4 text-gray-300" />
+
             <h3 className="text-xl font-bold text-[#191919]">
               No food found!
             </h3>
-            <p className="text-gray-500 text-sm mt-2">
+
+            <p className="mt-2 text-sm text-gray-500">
               Try another search or category.
             </p>
+
             <button
               onClick={() => {
                 setSearch("");
-                setActiveCategory("All");
+                setActiveCategory("all");
               }}
-              className="mt-5 bg-[#f52e26] text-white px-6 py-3 rounded-full text-sm font-bold"
+              className="mt-5 rounded-full bg-[#f52e26] px-6 py-3 text-sm font-bold text-white"
             >
               View All Food
             </button>
@@ -328,21 +329,26 @@ export default function MenuPage() {
 
       {/* BOTTOM CTA */}
       <section className="bg-[#fff5f3] py-16">
-        <div className="max-w-5xl mx-auto px-5 text-center">
-          <span className="text-[#f52e26] font-bold text-xs tracking-[3px]">
+        <div className="mx-auto max-w-5xl px-5 text-center">
+          <span className="text-xs font-bold tracking-[3px] text-[#f52e26]">
             FRESH • TASTY • DELICIOUS
           </span>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-[#191919] mt-4">
+
+          <h2 className="mt-4 text-3xl font-extrabold text-[#191919] md:text-5xl">
             Good Food Makes
-            <span className="text-[#f52e26]"> Every Day Better.</span>
+            <span className="text-[#f52e26]">
+              {" "}Every Day Better.
+            </span>
           </h2>
-          <p className="text-gray-500 mt-4 text-sm max-w-xl mx-auto leading-7">
+
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-gray-500">
             Your favorite flavors are just a few clicks away. Explore our menu
             and enjoy something delicious today.
           </p>
+
           <Link
             href="/"
-            className="inline-flex items-center gap-3 mt-8 bg-[#f52e26] text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-[#191919] transition-colors"
+            className="mt-8 inline-flex items-center gap-3 rounded-full bg-[#f52e26] px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-[#191919]"
           >
             Back To Home
             <ArrowRight size={18} />

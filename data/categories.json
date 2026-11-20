@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cat-1",
+    "name": "Burgers",
+    "slug": "burgers",
+    "description": "Delicious burgers made with fresh ingredients.",
+    "image": "/images/categories/burgers.jpg",
+    "isFeatured": true
+  },
+  {
+    "id": "cat-2",
+    "name": "Pizza",
+    "slug": "pizza",
+    "description": "Freshly baked pizzas with delicious toppings.",
+    "image": "/images/categories/pizza.jpg",
+    "isFeatured": true
+  },
+  {
+    "id": "cat-3",
+    "name": "Rice & Meals",
+    "slug": "rice",
+    "description": "Fresh and satisfying rice meals.",
+    "image": "/images/categories/rice.jpg",
+    "isFeatured": true
+  },
+  {
+    "id": "cat-4",
+    "name": "Pasta",
+    "slug": "pasta",
+    "description": "Creamy and delicious pasta dishes.",
+    "image": "/images/categories/pasta.jpg",
+    "isFeatured": true
+  },
+  {
+    "id": "cat-5",
+    "name": "Drinks",
+    "slug": "drinks",
+    "description": "Refreshing drinks and beverages.",
+    "image": "/images/categories/drinks.jpg",
+    "isFeatured": true
+  }
+]

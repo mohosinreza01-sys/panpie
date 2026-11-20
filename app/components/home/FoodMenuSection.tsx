@@ -3,8 +3,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Plus, Check } from "lucide-react";
+import { ArrowRight, Plus, Check, Heart } from "lucide-react";
 import { useState } from "react";
+
+import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
 
 type Category = "all" | "donuts" | "pizza" | "drinks" | "sandwich";
 
@@ -32,7 +35,7 @@ const products: Product[] = [
     id: 1,
     name: "Burger Kingo",
     description: "Gorgonzola, mozzarella, taleggio, red onions, capers, olives.",
-    price: "$25.00",
+    price: "25",
     image: "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
     badge: "POPULAR",
@@ -42,7 +45,7 @@ const products: Product[] = [
     id: 2,
     name: "French Fries",
     description: "Crispy golden potato fries with a delicious seasoning.",
-    price: "$25.00",
+    price: "25",
     image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
     options: ["Double Crust", "Regular"],
@@ -51,7 +54,7 @@ const products: Product[] = [
     id: 3,
     name: "Pizza BBQ TinTin",
     description: "Fresh mozzarella, BBQ sauce, vegetables and delicious toppings.",
-    price: "$18.00",
+    price: "18",
     image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
   },
@@ -59,7 +62,7 @@ const products: Product[] = [
     id: 4,
     name: "BBQ Pizza TinTin",
     description: "Premium cheese, fresh tomatoes, olives and special BBQ sauce.",
-    price: "$20.00",
+    price: "20",
     image: "https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=600&q=85",
     category: "pizza",
     badge: "NEW",
@@ -69,23 +72,23 @@ const products: Product[] = [
     id: 5,
     name: "Cold Drinks",
     description: "Refreshing chilled drinks for your perfect meal.",
-    price: "$5.00",
+    price: "5",
     image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=600&q=85",
     category: "drinks",
   },
   {
-  id: 6,
-  name: "Club Sandwich",
-  description: "Fresh bread, vegetables, cheese and delicious filling.",
-  price: "$12.00",
-  image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=85",
-  category: "sandwich",
-},
+    id: 6,
+    name: "Club Sandwich",
+    description: "Fresh bread, vegetables, cheese and delicious filling.",
+    price: "12",
+    image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=85",
+    category: "sandwich",
+  },
   {
     id: 7,
     name: "Chocolate Donuts",
     description: "Soft and fluffy donuts topped with rich chocolate.",
-    price: "$8.00",
+    price: "8",
     image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=600&q=85",
     category: "donuts",
   },
@@ -93,7 +96,7 @@ const products: Product[] = [
     id: 8,
     name: "Sweet Donuts",
     description: "Delicious sweet donuts with premium toppings.",
-    price: "$10.00",
+    price: "10",
     image: "https://images.unsplash.com/photo-1533910534207-90f31029a78e?auto=format&fit=crop&w=600&q=85",
     category: "donuts",
   },
@@ -101,17 +104,64 @@ const products: Product[] = [
 
 export default function FoodMenuSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("all");
-  const [cartCount, setCartCount] = useState(0);
+  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({});
   const [addedProducts, setAddedProducts] = useState<number[]>([]);
+
+  const addToCart = useCartStore((state) => state.addToCart);
+  const cartItems = useCartStore((state) => state.items);
+
+  const {
+    items: wishlist,
+    toggleWishlist,
+  } = useWishlistStore();
+
+  const cartCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const filteredProducts =
     activeCategory === "all"
       ? products
       : products.filter((product) => product.category === activeCategory);
 
-  const handleAddToCart = (id: number) => {
-    setCartCount((count) => count + 1);
-    setAddedProducts((previous) => [...previous, id]);
+  const handleAddToCart = (product: Product) => {
+    const selectedSize =
+      selectedSizes[product.id] || product.options?.[0] || "Regular";
+
+    const price = Number(product.price);
+
+    addToCart({
+      id: String(product.id),
+      name: product.name,
+      slug: product.name.toLowerCase().replace(/\s+/g, "-"),
+      price,
+      image: product.image,
+      size: selectedSize,
+      color: "Default",
+    });
+
+    setAddedProducts((previous) =>
+      previous.includes(product.id)
+        ? previous
+        : [...previous, product.id]
+    );
+
+    setTimeout(() => {
+      setAddedProducts((previous) =>
+        previous.filter((id) => id !== product.id)
+      );
+    }, 1200);
+  };
+
+  const handleWishlist = (product: Product) => {
+    toggleWishlist({
+      id: String(product.id),
+      name: product.name,
+      slug: product.name.toLowerCase().replace(/\s+/g, "-"),
+      price: Number(product.price),
+      image: product.image,
+    });
   };
 
   return (
@@ -119,7 +169,6 @@ export default function FoodMenuSection() {
       id="menu"
       className="relative overflow-hidden bg-white py-20 lg:py-24"
     >
-      {/* Background Decoration */}
       <div className="pointer-events-none absolute left-10 top-40 text-7xl opacity-10">
         🍔
       </div>
@@ -164,100 +213,141 @@ export default function FoodMenuSection() {
           ))}
         </div>
 
-        {/* Cart Count */}
-        <div className="mb-5 flex justify-end">
+        {/* Cart & Wishlist Count */}
+        <div className="mb-5 flex justify-end gap-3">
           <span className="rounded-full bg-[#fff5e2] px-4 py-2 text-xs font-bold text-gray-700">
             Cart Items: {cartCount}
           </span>
+
+          <Link
+            href="/wishlist"
+            className="rounded-full bg-red-50 px-4 py-2 text-xs font-bold text-red-500"
+          >
+            Wishlist: {wishlist.length}
+          </Link>
         </div>
 
         {/* Products */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="group overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-xl"
-            >
-              {/* Product Image */}
-              <div className="relative mb-5 flex h-[210px] items-center justify-center rounded-xl bg-[#fffaf2]">
+          {filteredProducts.map((product) => {
+            const isWishlisted = wishlist.some(
+              (item) => item.id === String(product.id)
+            );
 
-                {product.badge && (
-                  <span
-                    className={`absolute left-3 top-3 z-20 rounded-full px-3 py-1.5 text-[10px] font-bold ${
-                      product.badge === "POPULAR"
-                        ? "bg-[#f52e26] text-white"
-                        : "bg-[#ffb900] text-black"
+            const selectedSize =
+              selectedSizes[product.id] || product.options?.[0] || "Regular";
+
+            return (
+              <div
+                key={product.id}
+                className="group overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-xl"
+              >
+                {/* Product Image */}
+                <div className="relative mb-5 flex h-[210px] items-center justify-center rounded-xl bg-[#fffaf2]">
+
+                  {product.badge && (
+                    <span
+                      className={`absolute left-3 top-3 z-20 rounded-full px-3 py-1.5 text-[10px] font-bold ${
+                        product.badge === "POPULAR"
+                          ? "bg-[#f52e26] text-white"
+                          : "bg-[#ffb900] text-black"
+                      }`}
+                    >
+                      {product.badge}
+                    </span>
+                  )}
+
+                  {/* Wishlist Button */}
+                  <button
+                    onClick={() => handleWishlist(product)}
+                    aria-label={
+                      isWishlisted
+                        ? "Remove from wishlist"
+                        : "Add to wishlist"
+                    }
+                    className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition hover:scale-110"
+                  >
+                    <Heart
+                      size={19}
+                      className={
+                        isWishlisted ? "text-red-500" : "text-gray-500"
+                      }
+                      fill={isWishlisted ? "currentColor" : "none"}
+                    />
+                  </button>
+
+                  <div className="relative aspect-square w-[175px] overflow-hidden rounded-full bg-gray-100 ring-4 ring-white shadow-md">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="175px"
+                      className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
+                    />
+                  </div>
+                </div>
+
+                {/* Product Details */}
+                <h3 className="text-xl font-extrabold text-gray-900">
+                  {product.name}
+                </h3>
+
+                <p className="mt-3 min-h-[72px] text-sm leading-6 text-gray-500">
+                  {product.description}
+                </p>
+
+                {/* Price & Options */}
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  {product.options ? (
+                    <select
+                      aria-label={`Select ${product.name} size`}
+                      value={selectedSize}
+                      onChange={(e) =>
+                        setSelectedSizes((previous) => ({
+                          ...previous,
+                          [product.id]: e.target.value,
+                        }))
+                      }
+                      className="max-w-[125px] rounded-full border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#f52e26]"
+                    >
+                      {product.options.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span className="text-xs font-medium text-gray-400">
+                      Best choice
+                    </span>
+                  )}
+
+                  <span className="text-xl font-extrabold text-[#f52e26]">
+                    ৳{product.price}
+                  </span>
+                </div>
+
+                {/* Add Button */}
+                <div className="mt-5 flex justify-end">
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    aria-label={`Add ${product.name} to cart`}
+                    className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-all duration-300 ${
+                      addedProducts.includes(product.id)
+                        ? "bg-green-500"
+                        : "bg-[#ffb900] hover:bg-[#f52e26]"
                     }`}
                   >
-                    {product.badge}
-                  </span>
-                )}
-
-                {/* Circular Image */}
-                <div className="relative aspect-square w-[175px] overflow-hidden rounded-full bg-gray-100 ring-4 ring-white shadow-md">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 640px) 175px, (max-width: 1024px) 175px, 175px"
-                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
-                  />
+                    {addedProducts.includes(product.id) ? (
+                      <Check size={18} />
+                    ) : (
+                      <Plus size={20} />
+                    )}
+                  </button>
                 </div>
               </div>
-
-              {/* Product Details */}
-              <h3 className="text-xl font-extrabold text-gray-900">
-                {product.name}
-              </h3>
-
-              <p className="mt-3 min-h-[72px] text-sm leading-6 text-gray-500">
-                {product.description}
-              </p>
-
-              {/* Price & Options */}
-              <div className="mt-4 flex items-center justify-between gap-2">
-                {product.options ? (
-                  <select
-                    aria-label={`Select ${product.name} size`}
-                    className="max-w-[125px] rounded-full border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#f52e26]"
-                  >
-                    {product.options.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <span className="text-xs font-medium text-gray-400">
-                    Best choice
-                  </span>
-                )}
-
-                <span className="text-xl font-extrabold text-[#f52e26]">
-                  {product.price}
-                </span>
-              </div>
-
-              {/* Add Button */}
-              <div className="mt-5 flex justify-end">
-                <button
-                  onClick={() => handleAddToCart(product.id)}
-                  aria-label={`Add ${product.name} to cart`}
-                  className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-all duration-300 ${
-                    addedProducts.includes(product.id)
-                      ? "bg-green-500"
-                      : "bg-[#ffb900] hover:bg-[#f52e26]"
-                  }`}
-                >
-                  {addedProducts.includes(product.id) ? (
-                    <Check size={18} />
-                  ) : (
-                    <Plus size={20} />
-                  )}
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* View All */}
@@ -270,7 +360,6 @@ export default function FoodMenuSection() {
             <ArrowRight size={18} />
           </Link>
         </div>
-
       </div>
     </section>
   );

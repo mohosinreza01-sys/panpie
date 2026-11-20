@@ -13,29 +13,59 @@ import {
   ArrowUpRight,
   Clock,
   MapPin,
+  Plus,
+  Minus,
+  Trash2,
 } from "lucide-react";
+
+import { useCartStore } from "@/store/cart-store";
 
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Menu", href: "/menu" },
   { label: "Shop", href: "/shop" },
-
   {
     label: "About us",
     href: "/about",
     children: [
       { label: "Our Chefs", href: "/chefs" },
       { label: "Contact", href: "/contact" },
-      
     ],
   },
-
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] =
+    useState<string | null>(null);
+
+  // Zustand Cart Store
+  const cartItems = useCartStore((state) => state.items);
+  const removeFromCart = useCartStore(
+    (state) => state.removeFromCart
+  );
+  const updateQuantity = useCartStore(
+    (state) => state.updateQuantity
+  );
+
+  // Cart Calculations
+  const cartCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const subtotal = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+
+  const formatPrice = (price: number) =>
+    `৳${price.toLocaleString("en-BD", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
   return (
     <>
@@ -90,6 +120,7 @@ export default function Navbar() {
                       className="flex items-center gap-1.5 text-[13px] font-bold uppercase tracking-[0.8px] hover:text-[#ef302b] transition-colors"
                     >
                       {item.label}
+
                       {item.children && (
                         <ChevronDown size={14} />
                       )}
@@ -141,7 +172,11 @@ export default function Navbar() {
                   aria-label="Toggle search"
                   className="hidden sm:flex w-10 h-10 items-center justify-center hover:text-[#ef302b] transition"
                 >
-                  {searchOpen ? <X size={21} /> : <Search size={21} />}
+                  {searchOpen ? (
+                    <X size={21} />
+                  ) : (
+                    <Search size={21} />
+                  )}
                 </button>
 
                 {/* HOTLINE */}
@@ -154,6 +189,7 @@ export default function Navbar() {
                     <p className="text-[10px] font-bold text-gray-500 tracking-wider">
                       CALL FOR ORDER
                     </p>
+
                     <a
                       href="tel:+304779645"
                       className="text-[17px] font-extrabold"
@@ -163,17 +199,18 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                {/* CART */}
-                <Link
-                  href="/cart"
+                {/* CART BUTTON */}
+                <button
+                  onClick={() => setCartOpen(true)}
+                  aria-label="Open shopping cart"
                   className="relative w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-[#ffb900] text-white flex items-center justify-center hover:bg-[#ef302b] transition-colors"
                 >
                   <ShoppingCart size={20} />
 
-                  <span className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full bg-[#ef302b] border-2 border-[#f8f3e9] text-[9px] font-bold flex items-center justify-center">
-                    0
+                  <span className="absolute -top-1 -right-1 min-w-[19px] h-[19px] px-1 rounded-full bg-[#ef302b] border-2 border-[#f8f3e9] text-[9px] font-bold flex items-center justify-center">
+                    {cartCount}
                   </span>
-                </Link>
+                </button>
 
               </div>
             </div>
@@ -189,7 +226,10 @@ export default function Navbar() {
           }`}
         >
           <div className="max-w-[700px] mx-auto px-5 py-6">
-            <form action="/shop" className="flex items-center gap-3 border-b-2 border-[#ffb900] pb-3">
+            <form
+              action="/shop"
+              className="flex items-center gap-3 border-b-2 border-[#ffb900] pb-3"
+            >
               <Search size={21} className="text-gray-400" />
 
               <input
@@ -211,7 +251,252 @@ export default function Navbar() {
 
       </header>
 
-      {/* MOBILE DRAWER */}
+      {/* =================================
+          SIDE CART DRAWER
+      ================================= */}
+
+      <div
+        className={`fixed inset-0 z-[100] transition-all duration-300 ${
+          cartOpen
+            ? "visible"
+            : "invisible pointer-events-none"
+        }`}
+      >
+
+        {/* OVERLAY */}
+        <button
+          onClick={() => setCartOpen(false)}
+          aria-label="Close cart"
+          className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+            cartOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
+
+        {/* CART PANEL */}
+        <div
+          className={`absolute right-0 top-0 h-full w-full max-w-[430px] bg-white shadow-2xl flex flex-col transition-transform duration-300 ${
+            cartOpen
+              ? "translate-x-0"
+              : "translate-x-full"
+          }`}
+        >
+
+          {/* CART HEADER */}
+          <div className="h-[85px] px-6 flex items-center justify-between border-b border-gray-100 shrink-0">
+
+            <div>
+              <h2 className="text-xl font-black text-[#22201d]">
+                Your Cart
+              </h2>
+
+              <p className="text-xs text-gray-500 mt-1">
+                {cartCount} items in your cart
+              </p>
+            </div>
+
+            <button
+              onClick={() => setCartOpen(false)}
+              aria-label="Close cart"
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-[#ffb900] transition"
+            >
+              <X size={20} />
+            </button>
+
+          </div>
+
+          {/* CART BODY */}
+          <div className="flex-1 overflow-y-auto px-5 py-5">
+
+            {cartItems.length === 0 ? (
+
+              /* EMPTY CART */
+              <div className="h-full flex flex-col items-center justify-center text-center">
+
+                <div className="w-20 h-20 rounded-full bg-[#fff8ed] flex items-center justify-center mb-5">
+                  <ShoppingCart
+                    size={35}
+                    className="text-[#ffb900]"
+                  />
+                </div>
+
+                <h3 className="text-lg font-bold">
+                  Your cart is empty
+                </h3>
+
+                <p className="text-sm text-gray-500 mt-2">
+                  Add some delicious products to your cart.
+                </p>
+
+                <button
+                  onClick={() => setCartOpen(false)}
+                  className="mt-6 bg-[#ef302b] text-white px-7 py-3 rounded-full text-sm font-bold hover:bg-[#22201d] transition"
+                >
+                  Continue Shopping
+                </button>
+
+              </div>
+
+            ) : (
+
+              /* CART PRODUCTS */
+              <div className="space-y-5">
+
+                {cartItems.map((item) => (
+
+                  <div
+                    key={`${item.id}-${item.size}-${item.color}`}
+                    className="flex gap-4 pb-5 border-b border-gray-100"
+                  >
+
+                    {/* PRODUCT IMAGE */}
+                    <div className="w-[95px] h-[105px] bg-gray-100 rounded-xl overflow-hidden shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* PRODUCT INFO */}
+                    <div className="flex-1 min-w-0">
+
+                      <div className="flex justify-between gap-2">
+
+                        <h3 className="font-bold text-sm text-[#22201d]">
+                          {item.name}
+                        </h3>
+
+                        <button
+                          onClick={() =>
+                            removeFromCart(
+                              item.id,
+                              item.size,
+                              item.color
+                            )
+                          }
+                          aria-label={`Remove ${item.name}`}
+                          className="text-gray-400 hover:text-[#ef302b] transition shrink-0"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+
+                      </div>
+
+                      <p className="text-xs text-gray-500 mt-2">
+                        Size: {item.size} / Color: {item.color}
+                      </p>
+
+                      <p className="font-extrabold text-[#ef302b] mt-2">
+                        {formatPrice(item.price)}
+                      </p>
+
+                      {/* QUANTITY CONTROL */}
+                      <div className="flex items-center justify-between mt-3">
+
+                        <div className="flex items-center border border-gray-200 rounded-md">
+
+                          <button
+                            disabled={item.quantity <= 1}
+                            onClick={() =>
+                              updateQuantity(
+                                item.id,
+                                item.size,
+                                item.color,
+                                item.quantity - 1
+                              )
+                            }
+                            aria-label="Decrease quantity"
+                            className="w-8 h-8 flex items-center justify-center disabled:opacity-30"
+                          >
+                            <Minus size={13} />
+                          </button>
+
+                          <span className="w-8 text-center text-sm font-bold">
+                            {item.quantity}
+                          </span>
+
+                          <button
+                            onClick={() =>
+                              updateQuantity(
+                                item.id,
+                                item.size,
+                                item.color,
+                                item.quantity + 1
+                              )
+                            }
+                            aria-label="Increase quantity"
+                            className="w-8 h-8 flex items-center justify-center"
+                          >
+                            <Plus size={13} />
+                          </button>
+
+                        </div>
+
+                        <span className="text-sm font-bold">
+                          {formatPrice(item.price * item.quantity)}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            )}
+
+          </div>
+
+          {/* CART FOOTER */}
+          {cartItems.length > 0 && (
+
+            <div className="border-t border-gray-100 p-6 bg-[#f8f3e9] shrink-0">
+
+              <div className="flex justify-between items-center mb-2">
+
+                <span className="text-sm text-gray-600 font-medium">
+                  Subtotal
+                </span>
+
+                <span className="text-xl font-black text-[#22201d]">
+                  {formatPrice(subtotal)}
+                </span>
+
+              </div>
+
+              <p className="text-xs text-gray-500 mb-5">
+                Shipping and taxes calculated at checkout.
+              </p>
+
+              <Link
+                href="/checkout"
+                onClick={() => setCartOpen(false)}
+                className="w-full h-12 bg-[#ef302b] text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-[#22201d] transition"
+              >
+                PROCEED TO CHECKOUT
+              </Link>
+
+              <button
+                onClick={() => setCartOpen(false)}
+                className="w-full mt-3 text-sm font-bold text-gray-600 hover:text-[#ef302b] transition"
+              >
+                Continue Shopping
+              </button>
+
+            </div>
+
+          )}
+
+        </div>
+      </div>
+
+      {/* =================================
+          MOBILE NAVIGATION DRAWER
+      ================================= */}
+
       <div
         className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ${
           menuOpen
@@ -245,10 +530,12 @@ export default function Navbar() {
               className="flex items-center gap-2"
             >
               <span className="text-4xl">🍕</span>
+
               <div>
                 <h2 className="text-3xl font-black italic leading-none">
                   Panpie
                 </h2>
+
                 <p className="text-[7px] text-gray-500 font-bold tracking-[3px] text-center mt-1">
                   QUALITY FOOD
                 </p>
@@ -262,6 +549,7 @@ export default function Navbar() {
             >
               <X size={20} />
             </button>
+
           </div>
 
           {/* DRAWER BODY */}
@@ -274,7 +562,9 @@ export default function Navbar() {
             <nav className="flex flex-col">
 
               {navItems.map((item) => (
+
                 <div key={item.label}>
+
                   <div className="flex items-center justify-between border-b border-[#e9ddc8]">
 
                     <Link
@@ -286,6 +576,7 @@ export default function Navbar() {
                     </Link>
 
                     {item.children && (
+
                       <button
                         onClick={() =>
                           setActiveDropdown(
@@ -295,7 +586,9 @@ export default function Navbar() {
                           )
                         }
                         aria-label={`Toggle ${item.label} submenu`}
-                        aria-expanded={activeDropdown === item.label}
+                        aria-expanded={
+                          activeDropdown === item.label
+                        }
                         className="w-10 h-10 flex items-center justify-center"
                       >
                         <ChevronDown
@@ -307,10 +600,14 @@ export default function Navbar() {
                           }`}
                         />
                       </button>
+
                     )}
+
                   </div>
 
+                  {/* MOBILE SUBMENU */}
                   {item.children && (
+
                     <div
                       className={`grid transition-all duration-300 ${
                         activeDropdown === item.label
@@ -318,9 +615,13 @@ export default function Navbar() {
                           : "grid-rows-[0fr]"
                       }`}
                     >
+
                       <div className="overflow-hidden">
+
                         <div className="pl-5 py-2 flex flex-col gap-1">
+
                           {item.children.map((child) => (
+
                             <Link
                               key={child.label}
                               href={child.href}
@@ -329,14 +630,40 @@ export default function Navbar() {
                             >
                               {child.label}
                             </Link>
+
                           ))}
+
                         </div>
+
                       </div>
+
                     </div>
+
                   )}
+
                 </div>
+
               ))}
+
             </nav>
+
+            {/* MOBILE CART LINK */}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setCartOpen(true);
+              }}
+              className="w-full mt-7 p-4 bg-[#ffb900] rounded-xl flex items-center justify-between font-bold"
+            >
+              <span className="flex items-center gap-3">
+                <ShoppingCart size={19} />
+                View Shopping Cart
+              </span>
+
+              <span className="bg-[#ef302b] text-white text-xs px-2.5 py-1 rounded-full">
+                {cartCount}
+              </span>
+            </button>
 
             {/* CONTACT CARD */}
             <div className="mt-8 p-5 bg-white rounded-2xl border border-[#eee3d1]">
@@ -346,6 +673,7 @@ export default function Navbar() {
               </p>
 
               <div className="flex items-center gap-3">
+
                 <div className="w-11 h-11 bg-[#ef302b] rounded-full text-white flex items-center justify-center">
                   <PhoneCall size={19} />
                 </div>
@@ -354,6 +682,7 @@ export default function Navbar() {
                   <p className="text-xs text-gray-500">
                     Call us anytime
                   </p>
+
                   <a
                     href="tel:+304779645"
                     className="text-lg font-extrabold"
@@ -361,7 +690,9 @@ export default function Navbar() {
                     +304-779-645
                   </a>
                 </div>
+
               </div>
+
             </div>
 
             <p className="mt-8 text-center text-[10px] text-gray-400 tracking-[2px] font-semibold">
@@ -371,6 +702,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
     </>
   );
 }
