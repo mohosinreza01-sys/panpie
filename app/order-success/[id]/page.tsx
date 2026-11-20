@@ -1,10 +1,11 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   CheckCircle2,
   Package,
@@ -17,7 +18,25 @@ import {
 
 import { useOrderStore } from "@/store/order-store";
 
+// Main Page with Suspense
 export default function OrderSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#f8f3e9] flex items-center justify-center">
+          <p className="text-[#22201d] font-medium">
+            Loading order details...
+          </p>
+        </div>
+      }
+    >
+      <OrderSuccessContent />
+    </Suspense>
+  );
+}
+
+// Order Success Content
+function OrderSuccessContent() {
   const params = useParams<{ id: string }>();
   const orderId = params.id;
 
@@ -27,7 +46,7 @@ export default function OrderSuccessPage() {
     state.orders.find((item) => item.id === orderId)
   );
 
-  // Wait for LocalStorage data to load
+  // Wait for LocalStorage hydration
   useEffect(() => {
     const unsubscribe =
       useOrderStore.persist.onFinishHydration(() => {
@@ -41,6 +60,7 @@ export default function OrderSuccessPage() {
     return unsubscribe;
   }, []);
 
+  // Loading
   if (!hydrated) {
     return (
       <div className="min-h-screen bg-[#f8f3e9] flex items-center justify-center">
@@ -51,10 +71,14 @@ export default function OrderSuccessPage() {
     );
   }
 
+  // Order Not Found
   if (!order) {
     return (
       <div className="min-h-screen bg-[#f8f3e9] flex flex-col items-center justify-center px-5 text-center">
-        <Package size={55} className="text-gray-400 mb-4" />
+        <Package
+          size={55}
+          className="text-gray-400 mb-4"
+        />
 
         <h1 className="text-2xl font-bold text-[#22201d]">
           Order Not Found
@@ -99,10 +123,12 @@ export default function OrderSuccessPage() {
             Your order has been placed successfully.
           </p>
 
+          {/* Order Number */}
           <div className="inline-block mt-5 bg-white px-5 py-3 rounded-xl border border-gray-200">
             <p className="text-xs text-gray-500">
               Order Number
             </p>
+
             <p className="font-bold text-[#22201d] mt-1">
               {order.id}
             </p>
@@ -139,7 +165,7 @@ export default function OrderSuccessPage() {
                   />
                 </div>
 
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-[#22201d]">
                     {item.name}
                   </h3>
@@ -149,8 +175,9 @@ export default function OrderSuccessPage() {
                   </p>
                 </div>
 
-                <p className="font-bold text-[#22201d]">
-                  ৳{(item.price * item.quantity).toLocaleString("en-BD")}
+                <p className="font-bold text-[#22201d] shrink-0">
+                  ৳
+                  {(item.price * item.quantity).toLocaleString("en-BD")}
                 </p>
               </div>
             ))}
@@ -158,14 +185,19 @@ export default function OrderSuccessPage() {
 
           {/* Price Summary */}
           <div className="border-t border-gray-100 pt-5 space-y-3">
+
             <div className="flex justify-between text-gray-600">
               <span>Subtotal</span>
-              <span>৳{order.subtotal.toLocaleString("en-BD")}</span>
+              <span>
+                ৳{order.subtotal.toLocaleString("en-BD")}
+              </span>
             </div>
 
             <div className="flex justify-between text-gray-600">
               <span>Delivery Charge</span>
-              <span>৳{order.deliveryCharge.toLocaleString("en-BD")}</span>
+              <span>
+                ৳{order.deliveryCharge.toLocaleString("en-BD")}
+              </span>
             </div>
 
             <div className="flex justify-between text-xl font-extrabold text-[#22201d] border-t border-gray-100 pt-4">
@@ -174,50 +206,62 @@ export default function OrderSuccessPage() {
                 ৳{order.total.toLocaleString("en-BD")}
               </span>
             </div>
+
           </div>
         </div>
 
         {/* Customer Information */}
         <div className="bg-white rounded-2xl p-5 md:p-7 mt-5 shadow-sm">
+
           <h2 className="text-xl font-bold text-[#22201d] mb-6">
             Delivery Information
           </h2>
 
           <div className="space-y-5">
 
+            {/* Customer Name */}
             <div className="flex gap-3">
               <Package className="text-[#f52e26] shrink-0" />
+
               <div>
                 <p className="font-semibold text-[#22201d]">
                   Customer Name
                 </p>
+
                 <p className="text-gray-500 text-sm mt-1">
                   {order.customerName}
                 </p>
               </div>
             </div>
 
+            {/* Phone */}
             <div className="flex gap-3">
               <Phone className="text-[#f52e26] shrink-0" />
+
               <div>
                 <p className="font-semibold text-[#22201d]">
                   Phone Number
                 </p>
+
                 <p className="text-gray-500 text-sm mt-1">
                   {order.phone}
                 </p>
               </div>
             </div>
 
+            {/* Address */}
             <div className="flex gap-3">
               <MapPin className="text-[#f52e26] shrink-0" />
+
               <div>
                 <p className="font-semibold text-[#22201d]">
                   Delivery Address
                 </p>
+
                 <p className="text-gray-500 text-sm mt-1">
                   {order.address}
                 </p>
+
                 <p className="text-gray-500 text-sm mt-1">
                   {order.deliveryArea === "inside"
                     ? "Inside Dhaka"
@@ -226,12 +270,15 @@ export default function OrderSuccessPage() {
               </div>
             </div>
 
+            {/* Payment Method */}
             <div className="flex gap-3">
               <CreditCard className="text-[#f52e26] shrink-0" />
+
               <div>
                 <p className="font-semibold text-[#22201d]">
                   Payment Method
                 </p>
+
                 <p className="text-gray-500 text-sm mt-1">
                   {order.paymentMethod}
                 </p>
@@ -241,8 +288,9 @@ export default function OrderSuccessPage() {
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
+
           <Link
             href="/shop"
             className="flex-1 flex items-center justify-center gap-2 bg-[#ffb900] hover:bg-[#f0ad00] text-[#22201d] font-bold py-4 rounded-full transition"
@@ -258,6 +306,7 @@ export default function OrderSuccessPage() {
           >
             Back to Home
           </Link>
+
         </div>
 
       </div>
