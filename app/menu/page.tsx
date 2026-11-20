@@ -66,7 +66,8 @@ export default function MenuPage() {
         product.category === activeCategory;
 
       const matchesSearch =
-        product.name.toLowerCase().includes(search.toLowerCase());
+        product.name.toLowerCase().includes(search.toLowerCase()) ||
+        product.description.toLowerCase().includes(search.toLowerCase());
 
       return (
         matchesCategory &&
@@ -104,7 +105,7 @@ export default function MenuPage() {
           />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-5 py-24 text-center md:py-32 lg:px-8">
+        <div className="relative mx-auto container-custom px-5 py-24 text-center md:py-32 lg:px-8">
           <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#f52e26] px-5 py-2 text-xs font-bold tracking-[3px] text-white">
             <span className="h-2 w-2 rounded-full bg-white" />
             OUR FOOD MENU
@@ -215,12 +216,22 @@ export default function MenuPage() {
               const finalPrice =
                 product.discountPrice ?? product.price;
 
+              const categoryName =
+                categories.find(
+                  (category) => category.slug === product.category
+                )?.name ?? product.category;
+
               return (
                 <div
                   key={product.id}
-                  className="group overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:shadow-[0_15px_45px_rgba(0,0,0,0.09)]"
+                  className="group overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_45px_rgba(0,0,0,0.09)]"
                 >
-                  <div className="relative h-60 overflow-hidden bg-gray-100 sm:h-64">
+                  {/* PRODUCT IMAGE */}
+                  <Link
+                    href={`/menu/${product.slug}`}
+                    className="relative block h-60 overflow-hidden bg-gray-100 sm:h-64"
+                    aria-label={`View ${product.name} details`}
+                  >
                     <Image
                       src={product.image}
                       alt={product.name}
@@ -247,18 +258,19 @@ export default function MenuPage() {
                         </span>
                       </div>
                     )}
-                  </div>
+                  </Link>
 
+                  {/* PRODUCT INFO */}
                   <div className="p-6">
                     <span className="text-[11px] font-bold uppercase tracking-[2px] text-[#f52e26]">
-                      {categories.find(
-                        (category) => category.slug === product.category
-                      )?.name ?? product.category}
+                      {categoryName}
                     </span>
 
-                    <h3 className="mt-2 text-xl font-extrabold text-[#191919] transition-colors group-hover:text-[#f52e26]">
-                      {product.name}
-                    </h3>
+                    <Link href={`/menu/${product.slug}`}>
+                      <h3 className="mt-2 text-xl font-extrabold text-[#191919] transition-colors hover:text-[#f52e26]">
+                        {product.name}
+                      </h3>
+                    </Link>
 
                     <p className="mt-2 min-h-12 text-sm leading-6 text-gray-500">
                       {product.description}
@@ -270,31 +282,43 @@ export default function MenuPage() {
                       </p>
                     )}
 
-                    <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-5">
-                      <div>
-                        <span className="block text-xs text-gray-400">
-                          Price
-                        </span>
+                    {/* PRICE */}
+                    <div className="mt-5 border-t border-gray-100 pt-5">
+                      <span className="block text-xs text-gray-400">
+                        Price
+                      </span>
 
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
                         <span className="text-2xl font-extrabold text-[#f52e26]">
                           {formatPrice(finalPrice)}
                         </span>
 
                         {product.discountPrice &&
                           product.discountPrice < product.price && (
-                            <span className="ml-2 text-sm text-gray-400 line-through">
+                            <span className="text-sm text-gray-400 line-through">
                               {formatPrice(product.price)}
                             </span>
                           )}
                       </div>
+                    </div>
+
+                    {/* ACTIONS */}
+                    <div className="mt-5 flex gap-3">
+                      <Link
+                        href={`/menu/${product.slug}`}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-3 text-sm font-bold text-[#191919] transition hover:border-[#f52e26] hover:text-[#f52e26]"
+                      >
+                        View Details
+                        <ArrowRight size={16} />
+                      </Link>
 
                       <button
                         onClick={() => handleAddToCart(product)}
                         aria-label={`Add ${product.name} to cart`}
-                        className="flex items-center gap-2 rounded-full bg-[#191919] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#f52e26]"
+                        className="flex items-center justify-center gap-2 rounded-full bg-[#191919] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#f52e26]"
                       >
                         <Plus size={17} />
-                        Add To Cart
+                        Add
                       </button>
                     </div>
                   </div>

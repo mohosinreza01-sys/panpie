@@ -126,7 +126,7 @@ export default function PopularProductsSection() {
 
   return (
     <section className="overflow-hidden bg-white py-20 lg:py-24">
-      <div className="mx-auto max-w-[1200px] px-5 lg:px-8">
+      <div className="mx-auto container-custom px-5 lg:px-8">
 
         {/* Heading */}
         <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">

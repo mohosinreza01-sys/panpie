@@ -51,7 +51,7 @@ function YoutubeIcon() {
 export default function Footer() {
   return (
     <footer className="bg-[#191919] text-white pt-16 pb-6">
-      <div className="max-w-7xl mx-auto px-5 lg:px-8">
+      <div className="container-custom mx-auto px-5 lg:px-8">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 pb-12">
 

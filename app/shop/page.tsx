@@ -58,7 +58,6 @@ export default function ShopPage() {
   const [sort, setSort] = useState<SortOption>("featured");
   const [wishlist, setWishlist] = useState<string[]>([]);
 
-  // Zustand Cart Store
   const cartItems = useCartStore((state) => state.items);
   const addToCart = useCartStore((state) => state.addToCart);
 
@@ -67,7 +66,6 @@ export default function ShopPage() {
     0
   );
 
-  // Filter and Sort Products
   const filteredProducts = useMemo(() => {
     let result = products.filter((product) => {
       const matchesCategory =
@@ -113,6 +111,8 @@ export default function ShopPage() {
 
   // Add to Cart
   const handleAddToCart = (product: Product) => {
+    if (product.isAvailable === false) return;
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -140,7 +140,7 @@ export default function ShopPage() {
       <section className="relative overflow-hidden bg-[#191919] py-20 md:py-28">
         <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[#f52e26]/20 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-5 text-center lg:px-8">
+        <div className="relative mx-auto container-custom px-5 text-center lg:px-8">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-[#ff554e]">
             <ChefHat size={17} />
             PANPIE FOOD COLLECTION
@@ -305,16 +305,22 @@ export default function ShopPage() {
                   >
                     {/* IMAGE */}
                     <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover transition duration-700 group-hover:scale-110"
-                      />
+                      <Link
+                        href={`/menu/${product.slug}`}
+                        aria-label={`View ${product.name} details`}
+                        className="absolute inset-0 z-0"
+                      >
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover transition duration-700 group-hover:scale-110"
+                        />
+                      </Link>
 
                       {(product.isPopular || product.isFeatured) && (
-                        <span className="absolute left-4 top-4 rounded-full bg-[#f52e26] px-3 py-2 text-[10px] font-bold tracking-wider text-white">
+                        <span className="pointer-events-none absolute left-4 top-4 z-10 rounded-full bg-[#f52e26] px-3 py-2 text-[10px] font-bold tracking-wider text-white">
                           {product.isPopular ? "POPULAR" : "FEATURED"}
                         </span>
                       )}
@@ -322,8 +328,9 @@ export default function ShopPage() {
                       {/* WISHLIST */}
                       <button
                         onClick={() => toggleWishlist(product.id)}
-                        aria-label="Toggle wishlist"
-                        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-md transition hover:text-[#f52e26]"
+                        aria-label={`Toggle ${product.name} wishlist`}
+                        aria-pressed={wishlist.includes(product.id)}
+                        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow-md transition hover:text-[#f52e26]"
                       >
                         <Heart
                           size={19}
@@ -360,9 +367,11 @@ export default function ShopPage() {
                         )}
                       </div>
 
-                      <h3 className="mb-2 text-lg font-extrabold transition group-hover:text-[#f52e26]">
-                        {product.name}
-                      </h3>
+                      <Link href={`/menu/${product.slug}`}>
+                        <h3 className="mb-2 text-lg font-extrabold transition hover:text-[#f52e26]">
+                          {product.name}
+                        </h3>
+                      </Link>
 
                       <p className="mb-3 min-h-[44px] text-sm leading-6 text-gray-500">
                         {product.description}
@@ -390,7 +399,7 @@ export default function ShopPage() {
 
                         <button
                           onClick={() => handleAddToCart(product)}
-                          className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff0ef] text-[#f52e26] transition hover:bg-[#f52e26] hover:text-white"
+                          className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff0ef] text-[#f52e26] transition hover:bg-[#f52e26] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                           aria-label={`Add ${product.name} to cart`}
                           disabled={product.isAvailable === false}
                         >

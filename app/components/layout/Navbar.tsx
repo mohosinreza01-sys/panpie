@@ -73,7 +73,7 @@ export default function Navbar() {
 
         {/* TOP INFORMATION BAR */}
         <div className="hidden md:block bg-[#22201d] text-white">
-          <div className="max-w-[1250px] mx-auto px-6 h-10 flex items-center justify-between text-[11px] tracking-wide">
+          <div className="container-custom mx-auto px-6 h-10 flex items-center justify-between text-[11px] tracking-wide">
 
             <div className="flex items-center gap-6 text-white/75">
               <span className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export default function Navbar() {
 
         {/* MAIN NAVBAR */}
         <div className="border-b border-[#e9ddc8]">
-          <div className="max-w-[1250px] mx-auto px-5 lg:px-6">
+          <div className="container-custom mx-auto px-5 lg:px-6">
 
             <div className="h-[88px] lg:h-[105px] flex items-center justify-between">
 

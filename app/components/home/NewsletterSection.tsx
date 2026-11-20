@@ -32,7 +32,7 @@ export default function NewsletterSection() {
 
   return (
     <section className="relative overflow-hidden bg-white py-16 lg:py-20">
-      <div className="mx-auto max-w-[1200px] px-5 lg:px-8">
+      <div className="mx-auto container-custom px-5 lg:px-8">
 
         <div className="relative overflow-hidden rounded-[28px] bg-[#ef302b] px-7 py-12 md:px-12 lg:px-16">
 

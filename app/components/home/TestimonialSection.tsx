@@ -55,7 +55,7 @@ function StarRating() {
 export default function TestimonialSection() {
   return (
     <section className="relative overflow-hidden bg-[#f8f1e3] py-20 lg:py-24">
-      <div className="mx-auto max-w-[1200px] px-5 lg:px-8">
+      <div className="mx-auto container-custom px-5 lg:px-8">
 
         {/* Section Heading */}
         <div className="mb-14 text-center">

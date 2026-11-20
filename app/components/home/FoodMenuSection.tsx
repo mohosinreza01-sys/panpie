@@ -177,7 +177,7 @@ export default function FoodMenuSection() {
         🍕
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1200px] px-5">
+      <div className="relative z-10 mx-auto container-custom px-5">
 
         {/* Heading */}
         <div className="mx-auto mb-10 max-w-[550px] text-center">

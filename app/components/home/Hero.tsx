@@ -29,7 +29,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative max-w-[1200px] mx-auto px-5 lg:px-8">
+      <div className="relative container-custom mx-auto px-5 lg:px-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center min-h-[650px] py-14 lg:py-10">
 

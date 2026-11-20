@@ -32,7 +32,7 @@ export default function WhyChooseSection() {
       id="about"
       className="relative overflow-hidden bg-[#f8f1e3] py-20 lg:py-28"
     >
-      <div className="mx-auto max-w-[1200px] px-5 lg:px-8">
+      <div className="mx-auto container-custom px-5 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-20">
 
           {/* LEFT IMAGE AREA */}

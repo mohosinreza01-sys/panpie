@@ -82,7 +82,7 @@ export default function OurChefsPage() {
         <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-[#f52e26]/20 blur-3xl" />
         <div className="absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-[#f52e26]/10 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-5 text-center lg:px-8">
+        <div className="relative mx-auto container-custom px-5 text-center lg:px-8">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-[#ff554e]">
             <ChefHat size={17} />
             MEET OUR TEAM

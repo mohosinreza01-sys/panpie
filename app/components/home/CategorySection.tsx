@@ -31,7 +31,7 @@ export default function CategorySection() {
   return (
     <section className="relative overflow-hidden bg-white py-16 md:py-24">
 
-      <div className="mx-auto max-w-[1170px] px-5">
+      <div className="container-custom">
 
         {/* Heading */}
         <div className="mb-14 text-center">
